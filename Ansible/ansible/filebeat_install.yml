@@ -1,0 +1,32 @@
+--- 
+- 
+  become: true
+  hosts: webservers
+  name: "Config Web VM with Docker"
+  tasks: 
+    - 
+      shell: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.1-amd64.deb
+      name: Install filebeat
+    - 
+      shell: sudo dpkg -i filebeat-7.6.1-amd64.deb 
+      name: extract package
+    - 
+      name: "copy cofig file"
+      copy: 
+        src: /etc/ansible/filebeat-config.yml
+        dest: /etc/filebeat/filebeat.yml
+    - 
+      shell: filebeat modules enable system
+      name: Enable module
+    -
+      shell: filebeat setup
+      name: setup
+    -
+      shell: service filebeat start
+      name: start filebeat  
+    - 
+      name: "Enable filebeat service"
+      systemd: 
+        enabled: true
+        name: filebeat
+

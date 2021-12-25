@@ -1,0 +1,42 @@
+--- 
+- 
+  become: true
+  hosts: elk
+  name: "Config elk VM with Docker"
+  tasks:
+    - name: set vmsize
+      sysctl: name="vm.max_map_count" value="262144" sysctl_set=yes 
+    - 
+      apt: 
+        force_apt_get: true
+        name: docker.io
+        state: present
+        update_cache: true
+      name: docker.io
+    - 
+      apt: 
+        force_apt_get: true
+        name: python3-pip
+        state: present
+      name: "Install pip3"
+    - 
+      name: "Install Docker python module"
+      pip: 
+        name: docker
+        state: present
+    - 
+      docker_container: 
+        image: sebp/elk:761
+        name: elk
+        published_ports: 
+         - "5601:5601"
+         - "9200:9200"
+         - "5044:5044"
+        state: started
+     
+    - 
+      name: "Enable docker service"
+      systemd: 
+        enabled: true
+        name: docker
+

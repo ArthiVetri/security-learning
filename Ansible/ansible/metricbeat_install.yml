@@ -1,0 +1,35 @@
+--- 
+- 
+  become: true
+  hosts: webservers
+  name: "Config Web VM with Docker"
+  tasks: 
+    - 
+      shell: curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.6.1-amd64.deb
+      name: Install metribeat
+    - 
+      shell: sudo dpkg -i metricbeat-7.6.1-amd64.deb
+      name: extract package
+    - 
+      name: "copy cofig file"
+      copy: 
+        src: /etc/ansible/metricbeat-config.yml
+        dest: /etc/metricbeat/metricbeat.yml
+    - 
+      shell: sudo metricbeat modules enable docker
+      name: Enable module
+    -
+      shell: sudo metricbeat setup
+      name: setup
+    -
+      shell: sudo service metricbeat start
+      name: start metricbeat
+    -
+      shell: metricbeat -e
+      name: metricbeat  
+    - 
+      name: "Enable metricbeat service"
+      systemd: 
+        enabled: true
+        name: metricbeat
+
